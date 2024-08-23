@@ -46,10 +46,19 @@ define update_target
 	for module in $(1); do \
 		echo "Fetching dependencies for $$module"; \
 		cd $$module; \
-		go get ./... && grep -oP '^github\.com/Lyearn[^\s]*' go.mod | xargs -I {} go get {}@latest && go mod tidy; \
+		echo "Running: go get ./..."; \
+		go get ./...; \
+		deps=$$(grep -oP '^github\\.com/Lyearn[^\s]*' go.mod); \
+		for dep in $$deps; do \
+			echo "Running: go get $$dep@latest"; \
+			go get $$dep@latest; \
+		done; \
+		echo "Running: go mod tidy"; \
+		go mod tidy; \
 		cd - > /dev/null; \
 	done
 endef
+
 
 .PHONY: update-all-deps
 update-all-deps: 

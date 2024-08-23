@@ -460,104 +460,104 @@ jobs:
           echo "services: $services"
           echo "::set-output name=matrix::{\"service\": $services}"
 
-  build-push-and-deploy-services:
-    needs: [create-services-matrix, detect-service-changes]
-    if: ${{ always() && needs.detect-service-changes.outputs.changed-services != '' }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix: ${{ fromJson(needs.create-services-matrix.outputs.matrix) }}
-    defaults:
-      run:
-        working-directory: services/${{ matrix.service }}
+  # build-push-and-deploy-services:
+  #   needs: [create-services-matrix, detect-service-changes]
+  #   if: ${{ always() && needs.detect-service-changes.outputs.changed-services != '' }}
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix: ${{ fromJson(needs.create-services-matrix.outputs.matrix) }}
+  #   defaults:
+  #     run:
+  #       working-directory: services/${{ matrix.service }}
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Pull latest changes made by previous jobs
-        run: |-
-          git pull
+  #     - name: Pull latest changes made by previous jobs
+  #       run: |-
+  #         git pull
 
-      - name: Set short SHA to Environment variable
-        uses: benjlevesque/short-sha@v1.2
+  #     - name: Set short SHA to Environment variable
+  #       uses: benjlevesque/short-sha@v1.2
 
-      - name: Configure AWS Access Key
-        run: |-
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws eks --region ap-south-1 update-kubeconfig --name ${{ secrets.CLUSTER_NAME_DEVELOPMENT }}
-          echo "Image tag is sha-${{ env.SHA }}"
-          echo "DOCKER_IMAGE=${{ secrets.DOCKER_HUB_USERNAME }}/lyearn-go-${{ matrix.service }}-service:sha-${{ env.SHA }}" >> $GITHUB_ENV
+  #     - name: Configure AWS Access Key
+  #       run: |-
+  #         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws eks --region ap-south-1 update-kubeconfig --name ${{ secrets.CLUSTER_NAME_DEVELOPMENT }}
+  #         echo "Image tag is sha-${{ env.SHA }}"
+  #         echo "DOCKER_IMAGE=${{ secrets.DOCKER_HUB_USERNAME }}/lyearn-go-${{ matrix.service }}-service:sha-${{ env.SHA }}" >> $GITHUB_ENV
 
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+  #     - name: Login to DockerHub
+  #       uses: docker/login-action@v1
+  #       with:
+  #         username: ${{ secrets.DOCKER_HUB_USERNAME }}
+  #         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      - name: Login to GAR
-        uses: docker/login-action@v1
-        with:
-          registry: asia-south1-docker.pkg.dev
-          username: _json_key
-          password: ${{ secrets.GCLOUD_GCR_SERVICE_KEY }}
+  #     - name: Login to GAR
+  #       uses: docker/login-action@v1
+  #       with:
+  #         registry: asia-south1-docker.pkg.dev
+  #         username: _json_key
+  #         password: ${{ secrets.GCLOUD_GCR_SERVICE_KEY }}
 
-      - name: Build image and push to Docker Hub and GAR
-        uses: docker/build-push-action@v2
-        with:
-          context: ./services/${{ matrix.service }}
-          push: true
-          build-args: |
-            GH_GOPRIVATE_ACCESS_TOKEN=${{ secrets.GH_GOPRIVATE_ACCESS_TOKEN }}
-            GH_GOPRIVATE_USERNAME=${{ secrets.GH_GOPRIVATE_USERNAME }}
-          tags: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/lyearn-go-${{ matrix.service }}-service:sha-${{ env.SHA }}
-            asia-south1-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT_ID }}/${{ secrets.DOCKER_HUB_USERNAME }}/lyearn-go-${{ matrix.service }}-service:sha-${{ env.SHA }}
+  #     - name: Build image and push to Docker Hub and GAR
+  #       uses: docker/build-push-action@v2
+  #       with:
+  #         context: ./services/${{ matrix.service }}
+  #         push: true
+  #         build-args: |
+  #           GH_GOPRIVATE_ACCESS_TOKEN=${{ secrets.GH_GOPRIVATE_ACCESS_TOKEN }}
+  #           GH_GOPRIVATE_USERNAME=${{ secrets.GH_GOPRIVATE_USERNAME }}
+  #         tags: |
+  #           ${{ secrets.DOCKER_HUB_USERNAME }}/lyearn-go-${{ matrix.service }}-service:sha-${{ env.SHA }}
+  #           asia-south1-docker.pkg.dev/${{ secrets.GOOGLE_PROJECT_ID }}/${{ secrets.DOCKER_HUB_USERNAME }}/lyearn-go-${{ matrix.service }}-service:sha-${{ env.SHA }}
 
-      - name: Deploy the image
-        run: |-
-          echo "Docker image to be deployed: $DOCKER_IMAGE"
-          kubectl set image deployment/go-${{ matrix.service }}-service-deployment go-${{ matrix.service }}-service-cntnr=$DOCKER_IMAGE -n services --record
+  #     - name: Deploy the image
+  #       run: |-
+  #         echo "Docker image to be deployed: $DOCKER_IMAGE"
+  #         kubectl set image deployment/go-${{ matrix.service }}-service-deployment go-${{ matrix.service }}-service-cntnr=$DOCKER_IMAGE -n services --record
 
-      - name: Wait for image updation
-        continue-on-error: false
-        timeout-minutes: 10
-        run: kubectl rollout status deployment/go-${{ matrix.service }}-service-deployment -n services
+  #     - name: Wait for image updation
+  #       continue-on-error: false
+  #       timeout-minutes: 10
+  #       run: kubectl rollout status deployment/go-${{ matrix.service }}-service-deployment -n services
 
-  sync-gateway:
-    needs: [build-push-and-deploy-services, detect-service-changes]
-    if: ${{ always() && needs.detect-service-changes.outputs.changed-services != '' }}
-    runs-on: ubuntu-latest
+  # sync-gateway:
+  #   needs: [build-push-and-deploy-services, detect-service-changes]
+  #   if: ${{ always() && needs.detect-service-changes.outputs.changed-services != '' }}
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
 
-      - name: Set short SHA to Environment variable
-        uses: benjlevesque/short-sha@v1.2
+  #     - name: Set short SHA to Environment variable
+  #       uses: benjlevesque/short-sha@v1.2
 
-      - name: Configure AWS Access Key
-        run: |-
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws eks --region ap-south-1 update-kubeconfig --name ${{ secrets.CLUSTER_NAME_DEVELOPMENT }}
+  #     - name: Configure AWS Access Key
+  #       run: |-
+  #         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws eks --region ap-south-1 update-kubeconfig --name ${{ secrets.CLUSTER_NAME_DEVELOPMENT }}
 
-      - name: Deleting existing successfully completed jobs
-        timeout-minutes: 2
-        run: |-
-          kubectl delete jobs -n services --field-selector status.successful=1 -l app.lyearn.com/name=supergraph-sync-cron-job
+  #     - name: Deleting existing successfully completed jobs
+  #       timeout-minutes: 2
+  #       run: |-
+  #         kubectl delete jobs -n services --field-selector status.successful=1 -l app.lyearn.com/name=supergraph-sync-cron-job
 
-      - name: Trigger job to update supergraph
-        continue-on-error: false
-        run: |-
-          kubectl create job --from=cronjob/supergraph-sync-cron-job -n services supergraph-sync-job-manual-${{ env.SHA }}
+  #     - name: Trigger job to update supergraph
+  #       continue-on-error: false
+  #       run: |-
+  #         kubectl create job --from=cronjob/supergraph-sync-cron-job -n services supergraph-sync-job-manual-${{ env.SHA }}
 
-      - name: Wait for job to complete
-        continue-on-error: false
-        timeout-minutes: 2
-        run: kubectl wait --for=condition=complete job/supergraph-sync-job-manual-${{ env.SHA }} -n services --timeout=2m
+  #     - name: Wait for job to complete
+  #       continue-on-error: false
+  #       timeout-minutes: 2
+  #       run: kubectl wait --for=condition=complete job/supergraph-sync-job-manual-${{ env.SHA }} -n services --timeout=2m
 
-      - name: Restart gateway service deployment
-        continue-on-error: false
-        timeout-minutes: 2
-        run: kubectl rollout restart deployment/gateway-service -n services
+  #     - name: Restart gateway service deployment
+  #       continue-on-error: false
+  #       timeout-minutes: 2
+  #       run: kubectl rollout restart deployment/gateway-service -n services
