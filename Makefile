@@ -51,8 +51,8 @@ define update_target
 		deps=$$(awk -F'github.com/shreynadiadwala/Person-Lyearn-Testing-Backend-Universe/packages/' '{ for (i=2; i<=NF; i++) { split($$i, a, " "); print a[1] } }' go.mod); \
 		echo "deps: $$deps"; \
 		for dep in $$deps; do \
-			echo "Running: go get $$dep@latest"; \
-			go get $$dep@latest; \
+			echo "Running: go get github.com/shreynadiadwala/Person-Lyearn-Testing-Backend-Universe/packages/$$dep@latest"; \
+			go get github.com/shreynadiadwala/Person-Lyearn-Testing-Backend-Universe/packages/$$dep@latest; \
 		done; \
 		echo "Running: go mod tidy"; \
 		go mod tidy; \
