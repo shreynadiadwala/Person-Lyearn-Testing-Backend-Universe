@@ -1,2 +1,4 @@
-github.com/shreynadiadwala/Person-Lyearn-Testing-Backend-Universe/packages/stringutil v0.0.0-20240823081617-6d3d01975832 h1:L7Oy8o9Yr3yXtTtJNcDLmBLKDpIMZGU31wci4LIqI/k=
-github.com/shreynadiadwala/Person-Lyearn-Testing-Backend-Universe/packages/stringutil v0.0.0-20240823081617-6d3d01975832/go.mod h1:3xa+w91U99UNr24ohDjcTieXPxHBZMQ8YbgzegnxQpA=
+github.com/shreynadiadwala/Person-Lyearn-Testing-Backend-Universe/packages/stringutil v0.2.0 h1:HRt8a/H+U6zmrrd7xK/2om3ilhOWpCb7vI5IfdRe6rw=
+github.com/shreynadiadwala/Person-Lyearn-Testing-Backend-Universe/packages/stringutil v0.2.0/go.mod h1:rxSo4hTCy0oMMI1uKPBoRYoR8cgWnn+YT9FOBYVb5p4=
+github.com/shreynadiadwala/Person-Lyearn-Testing-Backend-Universe/packages/timeutil v0.0.1 h1:0v3VswOz7DFAzPaJLVgyJIN6INqE5eJQLEwfl2gKG7c=
+github.com/shreynadiadwala/Person-Lyearn-Testing-Backend-Universe/packages/timeutil v0.0.1/go.mod h1:+VgKAI8hkc/xdEADyo6+0Hpw8fNAStXPfux93KoOIco=
