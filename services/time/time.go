@@ -7,6 +7,6 @@ import (
 )
 
 func CurrentTime() {
-	fmt.Print("change")
+	fmt.Print("change..")
 	fmt.Print(timeutil.GetCurrentTime())
 }

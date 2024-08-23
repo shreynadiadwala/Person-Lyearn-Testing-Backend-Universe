@@ -7,6 +7,7 @@ import (
 )
 
 func Calculate() {
+	fmt.Print("change..")
 	fmt.Println("Add: ", mathutil.Add(2, 3))
 	fmt.Println("Multiply: ", mathutil.Multiply(2, 3))
 }
