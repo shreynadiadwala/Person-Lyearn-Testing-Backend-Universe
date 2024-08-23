@@ -39,7 +39,7 @@ define force_clean_target
 endef
 
 .PHONY: force-clean-all-deps
-force-clean-all-deps: set-go-priv-mod
+force-clean-all-deps: 
 	@$(call force_clean_target,$(MODULES))
 
 define update_target
@@ -52,11 +52,11 @@ define update_target
 endef
 
 .PHONY: update-all-deps
-update-all-deps: set-go-priv-mod
+update-all-deps: 
 	@$(call update_target,$(MODULES))
 
 .PHONY: update-service-deps
-update-service-deps: set-go-priv-mod
+update-service-deps: 
 	@if [ -z "$(services)" ]; then \
 		echo "Services string required. Use: make build-services services='svc1 svc2'"; \
 		exit 1; \
@@ -66,7 +66,7 @@ update-service-deps: set-go-priv-mod
 	$(call update_target,$$SERVICES)
 
 .PHONY: update-consumer-deps
-update-consumer-deps: set-go-priv-mod
+update-consumer-deps: 
 	@if [ -z "$(consumers)" ]; then \
 		echo "Consumers string required. Use: make build-consumers consumers='consumer1 consumer2'"; \
 		exit 1; \
@@ -85,23 +85,23 @@ define build_target
 endef
 
 .PHONY: build-all
-build-all: set-go-priv-mod
+build-all: 
 	@$(call build_target,$(MODULES))
 
 .PHONY: build-all-packages
-build-all-packages: set-go-priv-mod
+build-all-packages: 
 	@$(call build_target,$(PACKAGES))
 
 .PHONY: build-all-services
-build-all-services: set-go-priv-mod
+build-all-services: 
 	@$(call build_target,$(SERVICES))
 
 .PHONY: build-all-consumers
-build-all-consumers: set-go-priv-mod
+build-all-consumers: 
 	@$(call build_target,$(CONSUMERS))
 
 .PHONY: replace-deps
-replace-deps: set-go-priv-mod
+replace-deps: 
 	@if [ -z "$(module)" ]; then \
 		echo "Module path required. Use: make replace-deps module=<module-path>"; \
 		exit 1; \
