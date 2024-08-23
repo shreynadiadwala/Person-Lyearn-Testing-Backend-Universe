@@ -48,7 +48,7 @@ define update_target
 		cd $$module; \
 		echo "Running: go get ./..."; \
 		go get ./...; \
-		deps=$$(grep -oP '^github\\.com/shreynadiadwala[^\s]*' go.mod); \
+		deps=$$(grep -oP 'github\\.com/shreynadiadwala/Person-Lyearn-Testing-Backend-Universe/packages/\K[^ \n]+' go.mod); \
 		echo "deps: $$deps"; \
 		for dep in $$deps; do \
 			echo "Running: go get $$dep@latest"; \
@@ -59,6 +59,23 @@ define update_target
 		cd - > /dev/null; \
 	done
 endef
+
+define update_target_test
+	for module in $(1); do \
+		cd services/$$module; \
+		echo "Current directory: $$(pwd)"; \
+		deps=$$(grep -oP 'github\\.com/shreynadiadwala/Person-Lyearn-Testing-Backend-Universe/packages/\K[^ \n]+' go.mod); \
+		echo "deps: $$deps"; \
+		for dep in $$deps; do \
+			echo "$$dep@latest"; \
+		done; \
+		cd - > /dev/null; \
+	done
+endef
+
+.PHONY: build-test
+build-test: 
+	@$(call update_target_test, string)
 
 
 .PHONY: update-all-deps
