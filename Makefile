@@ -48,7 +48,8 @@ define update_target
 		cd $$module; \
 		echo "Running: go get ./..."; \
 		go get ./...; \
-		deps=$$(grep -oP '^github\\.com/Lyearn[^\s]*' go.mod); \
+		deps=$$(grep -oP '^github\\.com/shreynadiadwala[^\s]*' go.mod); \
+		echo "deps: $$deps"; \
 		for dep in $$deps; do \
 			echo "Running: go get $$dep@latest"; \
 			go get $$dep@latest; \
