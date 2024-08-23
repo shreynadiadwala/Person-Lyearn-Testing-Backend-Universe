@@ -3,7 +3,7 @@ name: Auto Build and Deploy on Dev
 on:
   push:
     branches:
-      - launchpad
+      - main
 
 jobs:
   setup-commit-hashes:
@@ -118,7 +118,7 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          release_branches: launchpad
+          release_branches: main
           default_bump: patch
           tag_prefix: ${{ matrix.package }}/v
           fetch_all_tags: true # by default this action fetched only last 100 tags.
