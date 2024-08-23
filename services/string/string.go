@@ -7,5 +7,6 @@ import (
 )
 
 func Reverse() {
+	fmt.Print("change..")
 	fmt.Print(stringutil.Reverse("abcd"))
 }
