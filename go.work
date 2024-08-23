@@ -1,0 +1,8 @@
+go 1.22.4
+
+use ./services/calculator
+use ./packages/mathutil
+use ./packages/stringutil
+use ./packages/timeutil
+
+
